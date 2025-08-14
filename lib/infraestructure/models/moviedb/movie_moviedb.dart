@@ -43,11 +43,9 @@ class MovieMovieDB {
     overview: json["overview"] ?? '',
     popularity: json["popularity"]?.toDouble(),
     posterPath: json["poster_path"] ?? '',
-    // releaseDate: json["release_date"] != null
-    //     ? DateFormat('dd/MM/yyyy').parse(json["release_date"])
-    //     : null,
-    releaseDate: json["release_date"] != null
-        ? DateTime.parse(json["release_date"])
+    releaseDate:
+        (json["release_date"] != null && json["release_date"].isNotEmpty)
+        ? DateTime.tryParse(json["release_date"].split(' ').first)
         : null,
     title: json["title"],
     video: json["video"],

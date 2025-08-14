@@ -1,8 +1,10 @@
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/presentation/delegates/search_movie_delegate.dart';
 import 'package:cinemapedia/presentation/providers/movies/movies_repository_provider.dart';
+import 'package:cinemapedia/presentation/providers/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomAppbar extends ConsumerWidget {
   @override
@@ -24,17 +26,30 @@ class CustomAppbar extends ConsumerWidget {
               Text('Cinemapedia', style: titleStyle),
               const Spacer(),
               IconButton(
-                onPressed: () async {
-                  final movieReposiory = ref.read(movieRepositoryProvider);
+                onPressed: () {
+                  final searchedMovies = ref.read(searchMoviesProvider);
+                  final searchQuery = ref.read(searchQueryProvider);
 
-                  final movie = await showSearch<Movie?>(
+                  showSearch<Movie?>(
+                    query: searchQuery,
                     context: context,
                     delegate: SearchMovieDelegate(
-                      searchMovies: movieReposiory.searchMovies,
+                      initialMovie: searchedMovies,
+                      searchMovies: ref
+                          .read(searchMoviesProvider.notifier)
+                          .searchMoviesByQuery,
+                      // (query) {
+                      //   ref
+                      //       .read(searchQueryProvider.notifier)
+                      //       .update((state) => query);
+                      //   return movieRepository.searchMovies(query);
+                      // },
                     ),
-                  );
+                  ).then((movie) {
+                    if (movie == null) return;
 
-                  print(movie?.title);
+                    context.push('/movie/${movie.id}');
+                  });
                 },
                 icon: Icon(Icons.search),
               ),
